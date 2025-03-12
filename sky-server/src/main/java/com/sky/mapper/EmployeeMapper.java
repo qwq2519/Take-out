@@ -23,4 +23,6 @@ public interface EmployeeMapper {
     void insert(Employee employee);
 
     List<Employee> list(String name);
+
+    void update(Employee employee);
 }
