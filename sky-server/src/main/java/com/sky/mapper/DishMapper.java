@@ -5,9 +5,11 @@ import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.enumeration.OperationType;
 import com.sky.vo.DishVO;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.data.domain.DomainEvents;
 
 import java.util.List;
 
@@ -28,4 +30,9 @@ public interface DishMapper {
     void insert(Dish dish);
 
     List<DishVO> list(DishPageQueryDTO dishPageQueryDTO);
+
+    List<Dish> listByIds(List<Long> ids);
+
+    @Delete("DELETE FROM dish WHERE id=#{id}")
+    void deleteById(Long id);
 }

@@ -9,4 +9,5 @@
             (#{item.dishId},#{item.name},#{item.value})
         </foreach>
     </insert>
+
 </mapper>

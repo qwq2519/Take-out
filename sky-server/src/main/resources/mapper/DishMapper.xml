@@ -7,7 +7,7 @@
         insert into dish (name, category_id, price, image, description, create_time, update_time, create_user,update_user, status)
         values (#{name}, #{categoryId}, #{price}, #{image}, #{description}, #{createTime}, #{updateTime}, #{createUser}, #{updateUser}, #{status})
     </insert>
-    <select id="list" resultType="com.sky.entity.Dish">
+    <select id="list" resultType="com.sky.vo.DishVO">
         SELECT d.* , c.name categoryname  FROM dish d LEFT JOIN category c ON d.category_id = c.id
         <where>
             <if test="name != null">
@@ -21,6 +21,14 @@
             </if>
         </where>
         ORDER BY d.create_time DESC
-
     </select>
+    <select id="listByIds" resultType="com.sky.entity.Dish">
+        SELECT * FROM dish
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+
 </mapper>
