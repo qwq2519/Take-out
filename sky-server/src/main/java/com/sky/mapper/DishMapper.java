@@ -37,10 +37,14 @@ public interface DishMapper {
 
     List<Dish> listByIds(List<Long> ids);
 
+    @Select("SELECT * FROM dish WHERE category_id = #{categoryId}")
+    List<Dish> listByCategoryId(Long categoryId);
+
     @Delete("DELETE FROM dish WHERE id=#{id}")
     void deleteById(Long id);
 
     DishVO getById(Long id);
+
 
 
 }

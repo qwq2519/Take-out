@@ -2,6 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sky.mapper.SetmealMapper">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO setmeal(category_id, name, price, description, image, create_time, update_time, create_user,
+                            update_user)
+        VALUES (#{categoryId}, #{name}, #{price}, #{description}, #{image}, #{createTime}, #{updateTime}, #{createUser},
+                #{updateUser})
+    </insert>
     <select id="listByDishIds" resultType="java.lang.Long">
         SELECT * FROM setmeal_dish
         WHERE dish_id IN
