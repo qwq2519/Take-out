@@ -2,5 +2,9 @@
 .idea
 *.iml
 *.class
+
+sky-server/src/main/resources/application-*.yml
+
+
 #*Test.java
 #**/test/
