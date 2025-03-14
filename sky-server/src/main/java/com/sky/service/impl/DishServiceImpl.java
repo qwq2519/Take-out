@@ -8,6 +8,9 @@ import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.entity.Setmeal;
+import com.sky.entity.SetmealDish;
+import com.sky.exception.BaseException;
 import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
@@ -23,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class DishServiceImpl implements DishService {
@@ -53,9 +57,8 @@ public class DishServiceImpl implements DishService {
 
         List<DishFlavor> flavorList = dishDTO.getFlavors();
         if (!CollectionUtils.isEmpty(flavorList)) {
-            flavorList.forEach(flavor -> {
-                flavor.setDishId(id);
-            });
+            flavorList.forEach(flavor -> flavor.setDishId(id));
+
             dishFlavorMapper.insertBatch(flavorList);
         }
 
@@ -89,7 +92,7 @@ public class DishServiceImpl implements DishService {
         }
 
         //套餐表中有的不能删除
-        List<Long> setmealIds=setmealDishMapper.listByDishIds(ids);
+        List<SetmealDish> setmealIds=setmealDishMapper.listByDishIds(ids);
 
         if(!CollectionUtils.isEmpty(setmealIds)){
             throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
@@ -143,5 +146,46 @@ public class DishServiceImpl implements DishService {
     @Override
     public List<Dish> listByCategoryId(Long categoryId) {
         return dishMapper.listByCategoryId(categoryId);
+    }
+
+    @Override
+    public void updateStatus(Integer status, Long id) {
+        DishVO dishVO = dishMapper.getById(id);
+
+        if(status.equals(dishVO.getStatus())){
+            return;
+        }
+        Dish dish = new Dish();
+        dish.setId(id);
+        dish.setStatus(status);
+
+        //要起售，直接起售
+        if(StatusConstant.ENABLE.equals(status)) {
+            dishMapper.update(dish);
+            return;
+        }
+
+
+        //如果要停售,要看看有没有处于起售的套餐
+
+
+        //先查询套餐-菜品表
+        List<SetmealDish> setmealDishList = setmealDishMapper.listByDishIds(List.of(id));
+
+        //将其中的套餐id列出来
+        List<Long> setmealIds = setmealDishList.stream().map(SetmealDish::getSetmealId).collect(Collectors.toList());
+
+        List<Setmeal> setmealList = setmealMapper.listByIds(setmealIds);
+
+        for (Setmeal setmeal : setmealList) {
+            //有处于起售的套餐，不能停售
+            if(StatusConstant.ENABLE.equals(setmeal.getStatus())){
+                throw new BaseException(MessageConstant.DISH_IN_ACTIVE_SETMEAL_CANNOT_DISABLE);
+            }
+        }
+
+        //可以停售
+        dishMapper.update(dish);
+
     }
 }
