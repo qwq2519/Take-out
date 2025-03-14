@@ -55,12 +55,12 @@ public class SetmealServiceImpl implements SetmealService {
 
     @Override
     public PageResult page(SetmealPageQueryDTO setmealPageQueryDTO) {
-        PageHelper.startPage(setmealPageQueryDTO.getPage(),setmealPageQueryDTO.getPageSize());
+        PageHelper.startPage(setmealPageQueryDTO.getPage(), setmealPageQueryDTO.getPageSize());
 
         List<SetmealVO> list = setmealMapper.listByPage(setmealPageQueryDTO);
         Page<SetmealVO> p = (Page<SetmealVO>) list;
 
-        return  new PageResult(p.getTotal(),p.getResult());
+        return new PageResult(p.getTotal(), p.getResult());
     }
 
     @Override
@@ -70,7 +70,7 @@ public class SetmealServiceImpl implements SetmealService {
 
         //起售的套餐不能删除
         for (Setmeal setmeal : list) {
-            if(StatusConstant.ENABLE.equals(setmeal.getStatus())){
+            if (StatusConstant.ENABLE.equals(setmeal.getStatus())) {
                 throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ON_SALE);
             }
         }
@@ -85,5 +85,28 @@ public class SetmealServiceImpl implements SetmealService {
     @Override
     public SetmealVO getById(Integer id) {
         return setmealMapper.getById(id);
+    }
+
+    @Transactional
+    @Override
+    public void update(SetmealDTO setmealDTO) {
+        Setmeal setmeal = new Setmeal();
+        BeanUtils.copyProperties(setmealDTO, setmeal);
+
+        //删除原来的套餐菜品信息
+        setmealDishMapper.deleteBySetmealIds(List.of(setmeal.getId()));
+
+
+        //插入新的套餐-菜品
+        List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
+        setmealDishes.forEach(setmealDish -> {
+            setmealDish.setSetmealId(setmeal.getId());
+        });
+        setmealDishMapper.insertBatch(setmealDishes);
+
+        //更新套餐
+        setmealMapper.update(setmeal);
+
+
     }
 }
