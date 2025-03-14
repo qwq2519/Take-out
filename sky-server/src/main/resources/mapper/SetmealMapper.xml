@@ -4,10 +4,16 @@
 <mapper namespace="com.sky.mapper.SetmealMapper">
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO setmeal(category_id, name, price, description, image, create_time, update_time, create_user,
-                            update_user)
+                            update_user,status)
         VALUES (#{categoryId}, #{name}, #{price}, #{description}, #{image}, #{createTime}, #{updateTime}, #{createUser},
-                #{updateUser})
+                #{updateUser},#{status})
     </insert>
+    <delete id="deleteByIds">
+        DELETE FROM setmeal WHERE id IN
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
 
 
     <select id="listByPage" resultType="com.sky.vo.SetmealVO">
@@ -25,5 +31,11 @@
                 AND setmeal.category_id = #{categoryId}
             </if>
         </where>
+    </select>
+    <select id="listByIds" resultType="com.sky.entity.Setmeal">
+        SELECT * FROM setmeal WHERE id IN
+        <foreach collection="ids" item ="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
     </select>
 </mapper>
