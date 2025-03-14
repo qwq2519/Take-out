@@ -45,4 +45,6 @@ public class SetmealVO implements Serializable {
 
     //套餐和菜品的关联关系
     private List<SetmealDish> setmealDishes = new ArrayList<>();
+
+
 }

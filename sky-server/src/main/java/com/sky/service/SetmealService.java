@@ -14,7 +14,9 @@ public interface SetmealService {
 
     void deleteBatch(List<Long> ids);
 
-    SetmealVO getById(Integer id);
+    SetmealVO getById(Long id);
 
     void update(SetmealDTO setmealDTO);
+
+    void updateStatus(Integer status, Long id);
 }

@@ -12,6 +12,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.data.domain.DomainEvents;
 
+import javax.websocket.server.ServerEndpoint;
 import java.util.List;
 
 @Mapper
@@ -45,6 +46,6 @@ public interface DishMapper {
 
     DishVO getById(Long id);
 
-
-
+    @Select("SELECT dish.* FROM dish LEFT JOIN setmeal_dish ON dish.id = setmeal_dish.dish_id WHERE setmeal_dish.setmeal_id=#{id}")
+    List<Dish> listBySetmealId(Long id);
 }

@@ -2,13 +2,17 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.annotation.AutoFill;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
+import com.sky.entity.Dish;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
 import com.sky.exception.DeletionNotAllowedException;
+import com.sky.exception.SetmealEnableFailedException;
+import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
@@ -18,8 +22,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SetmealServiceImpl implements SetmealService {
@@ -29,6 +35,9 @@ public class SetmealServiceImpl implements SetmealService {
 
     @Autowired
     SetmealMapper setmealMapper;
+
+    @Autowired
+    DishMapper dishMapper;
 
 
     @Transactional
@@ -83,7 +92,7 @@ public class SetmealServiceImpl implements SetmealService {
     }
 
     @Override
-    public SetmealVO getById(Integer id) {
+    public SetmealVO getById(Long id) {
         return setmealMapper.getById(id);
     }
 
@@ -106,7 +115,59 @@ public class SetmealServiceImpl implements SetmealService {
 
         //更新套餐
         setmealMapper.update(setmeal);
+    }
 
+    @Override
+    public void updateStatus(Integer status, Long id) {
+        //查询套餐完整信息
+        SetmealVO setMeal = setmealMapper.getById(id);
+
+        //状态一样，那就没必要更新了
+        if(status.equals(setMeal.getStatus())) {
+            return;
+        }
+
+
+        Setmeal setmeal = new Setmeal();
+        setmeal.setStatus(status);
+        setmeal.setId(id);
+
+
+        //停售套餐，直接停了
+        if(status.equals(StatusConstant.DISABLE)) {
+            setmealMapper.update(setmeal);
+            return;
+        }
+
+        //如果要起售，那么菜品中不能有停售的
+
+        List<Dish> dishes = dishMapper.listBySetmealId(id);
+        if(CollectionUtils.isEmpty(dishes)){
+            setmealMapper.update(setmeal);
+            return ;
+        }
+        dishes.forEach(dish -> {
+                if (StatusConstant.DISABLE.equals(dish.getStatus())) {
+                    throw new SetmealEnableFailedException(MessageConstant.SETMEAL_ENABLE_FAILED);
+                }
+            });
+        setmealMapper.update(setmeal);
+//      方案二
+// 得到套餐-菜品关系表
+//        {
+//            List<SetmealDish> setmealDishes = setMeal.getSetmealDishes();
+//
+//            //将每个SetmealDish的菜品id提取为一个list,得到菜品集合
+//            List<Long> dishIds = setmealDishes.stream().map(SetmealDish::getDishId).collect(Collectors.toList());
+//            List<Dish> dishes = dishMapper.listByIds(dishIds);
+//
+//            //检查是否有停售的菜品
+//            dishes.forEach(dish -> {
+//                if (StatusConstant.DISABLE.equals(dish.getStatus())) {
+//                    throw new SetmealEnableFailedException(MessageConstant.SETMEAL_ENABLE_FAILED);
+//                }
+//            });
+//        }
 
     }
 }
