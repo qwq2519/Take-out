@@ -9,6 +9,12 @@
             (#{it.setmealId},#{it.dishId},#{it.name},#{it.price},#{it.copies})
         </foreach>
     </insert>
+    <delete id="deleteBySetmealIds">
+        DELETE FROM setmeal_dish WHERE setmeal_id IN
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
 
     <select id="listByDishIds" resultType="java.lang.Long">
         SELECT * FROM setmeal_dish
