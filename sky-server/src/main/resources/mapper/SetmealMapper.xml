@@ -38,4 +38,54 @@
             #{id}
         </foreach>
     </select>
+
+    <select id="getById" resultType="com.sky.vo.SetmealVO" resultMap="getByIdResultMap">
+        SELECT s.id AS setmeal_id,
+               s.category_id,
+               s.name AS setmeal_name,
+               s.price AS setmeal_price,
+               s.status,
+               s.description,
+               s.image,
+               s.create_time,
+               s.update_time,
+               s.create_user,
+               s.update_user,
+               c.name AS categoryName,
+               sd.id AS sd_id,
+               sd.setmeal_id,
+               sd.dish_id,
+               sd.name AS dish_name,
+               sd.price AS dish_price,
+               sd.copies
+        FROM setmeal s
+                 LEFT JOIN category c ON c.id = s.category_id
+                 LEFT JOIN setmeal_dish sd ON s.id = sd.setmeal_id
+        WHERE s.id = #{id}
+    </select>
+    <resultMap id="getByIdResultMap" type="com.sky.vo.SetmealVO">
+         <id property="id" column="setmeal_id"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="name" column="setmeal_name"/>
+        <result property="price" column="setmeal_price"/>
+        <result property="status" column="status"/>
+        <result property="description" column="description"/>
+        <result property="image" column="image"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="categoryName" column="categoryName"/>
+
+        <collection
+                property="setmealDishes"
+                ofType="com.sky.entity.SetmealDish"
+                resultMap="setmealDishMap"/>
+    </resultMap>
+
+    <resultMap id="setmealDishMap" type="com.sky.entity.SetmealDish">
+        <id property="id" column="sd_id"/>
+        <result property="setmealId" column="setmeal_id"/>
+        <result property="dishId" column="dish_id"/>
+        <result property="name" column="dish_name"/>
+        <result property="price" column="dish_price"/>
+        <result property="copies" column="copies"/>
+    </resultMap>
 </mapper>

@@ -81,4 +81,9 @@ public class SetmealServiceImpl implements SetmealService {
         //删除套餐
         setmealMapper.deleteByIds(ids);
     }
+
+    @Override
+    public SetmealVO getById(Integer id) {
+        return setmealMapper.getById(id);
+    }
 }
