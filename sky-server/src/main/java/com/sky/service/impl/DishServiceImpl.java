@@ -11,6 +11,7 @@ import com.sky.entity.DishFlavor;
 import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
+import com.sky.mapper.SetmealDishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
@@ -33,6 +34,8 @@ public class DishServiceImpl implements DishService {
 
     @Autowired
     private SetmealMapper setmealMapper;
+    @Autowired
+    private SetmealDishMapper setmealDishMapper;
 
     @Override
     public void save(DishDTO dishDTO) {
@@ -86,7 +89,7 @@ public class DishServiceImpl implements DishService {
         }
 
         //套餐表中有的不能删除
-        List<Long> setmealIds= setmealMapper.listByDishIds(ids);
+        List<Long> setmealIds=setmealDishMapper.listByDishIds(ids);
 
         if(!CollectionUtils.isEmpty(setmealIds)){
             throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);

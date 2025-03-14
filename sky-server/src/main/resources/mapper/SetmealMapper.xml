@@ -8,11 +8,22 @@
         VALUES (#{categoryId}, #{name}, #{price}, #{description}, #{image}, #{createTime}, #{updateTime}, #{createUser},
                 #{updateUser})
     </insert>
-    <select id="listByDishIds" resultType="java.lang.Long">
-        SELECT * FROM setmeal_dish
-        WHERE dish_id IN
-        <foreach collection="ids" item="id" separator="," open="(" close=")">
-            #{id}
-        </foreach>
+
+
+    <select id="listByPage" resultType="com.sky.vo.SetmealVO">
+        SELECT setmeal.*,category.name categoryName
+        FROM setmeal LEFT JOIN category
+            ON setmeal.category_id = category.id
+        <where>
+            <if test="name != null and name !=''">
+                setmeal.name LIKE CONCAT('%',#{name},'%')
+            </if>
+            <if test="status != null">
+                AND setmeal.status = #{status}
+            </if>
+            <if test="categoryId!=null">
+                AND setmeal.category_id = #{categoryId}
+            </if>
+        </where>
     </select>
 </mapper>

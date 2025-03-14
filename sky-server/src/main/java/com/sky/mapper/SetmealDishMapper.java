@@ -9,4 +9,5 @@ import java.util.List;
 @Mapper
 public interface SetmealDishMapper {
     void insertBatch(List<SetmealDish> setmealDishList);
+    List<Long> listByDishIds(List<Long> ids);
 }

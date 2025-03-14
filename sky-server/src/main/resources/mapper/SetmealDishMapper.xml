@@ -9,4 +9,13 @@
             (#{it.setmealId},#{it.dishId},#{it.name},#{it.price},#{it.copies})
         </foreach>
     </insert>
+
+    <select id="listByDishIds" resultType="java.lang.Long">
+        SELECT * FROM setmeal_dish
+        WHERE dish_id IN
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
 </mapper>
