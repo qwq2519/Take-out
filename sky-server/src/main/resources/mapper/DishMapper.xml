@@ -25,7 +25,7 @@
 
 
 
-    <select id="list" resultType="com.sky.vo.DishVO">
+    <select id="listByPage" resultType="com.sky.vo.DishVO">
         SELECT d.* , c.name categoryname  FROM dish d LEFT JOIN category c ON d.category_id = c.id
         <where>
             <if test="name != null">
@@ -52,6 +52,22 @@
         FROM dish d
                  LEFT JOIN category c ON d.category_id = c.id
         WHERE d.id= #{id}
+    </select>
+    <select id="list" resultType="com.sky.entity.Dish">
+        SELECT * FROM dish
+        <where>
+            <if test="name != null and name != ''">
+                name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="categoryId != null">
+                AND category_id = #{categoryId}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+
+
     </select>
 
 

@@ -1,18 +1,14 @@
 package com.sky.mapper;
 
 import com.sky.annotation.AutoFill;
-import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.enumeration.OperationType;
 import com.sky.vo.DishVO;
 import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
-import org.springframework.data.domain.DomainEvents;
 
-import javax.websocket.server.ServerEndpoint;
 import java.util.List;
 
 @Mapper
@@ -34,7 +30,7 @@ public interface DishMapper {
     @AutoFill(OperationType.UPDATE)
     void update(Dish dish);
 
-    List<DishVO> list(DishPageQueryDTO dishPageQueryDTO);
+    List<DishVO> listByPage(DishPageQueryDTO dishPageQueryDTO);
 
     List<Dish> listByIds(List<Long> ids);
 
@@ -48,4 +44,6 @@ public interface DishMapper {
 
     @Select("SELECT dish.* FROM dish LEFT JOIN setmeal_dish ON dish.id = setmeal_dish.dish_id WHERE setmeal_dish.setmeal_id=#{id}")
     List<Dish> listBySetmealId(Long id);
+
+    List<Dish> list(Dish dish);
 }
