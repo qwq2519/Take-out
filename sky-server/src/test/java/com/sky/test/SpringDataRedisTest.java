@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-@SpringBootTest
+//@SpringBootTest //不需要测试的时候注释掉
 public class SpringDataRedisTest {
 
     @Autowired
