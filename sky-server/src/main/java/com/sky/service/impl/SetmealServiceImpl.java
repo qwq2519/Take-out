@@ -17,6 +17,7 @@ import com.sky.mapper.SetmealDishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.SetmealService;
+import com.sky.vo.DishItemVO;
 import com.sky.vo.SetmealVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,7 +124,7 @@ public class SetmealServiceImpl implements SetmealService {
         SetmealVO setMeal = setmealMapper.getById(id);
 
         //状态一样，那就没必要更新了
-        if(status.equals(setMeal.getStatus())) {
+        if (status.equals(setMeal.getStatus())) {
             return;
         }
 
@@ -134,7 +135,7 @@ public class SetmealServiceImpl implements SetmealService {
 
 
         //停售套餐，直接停了
-        if(status.equals(StatusConstant.DISABLE)) {
+        if (status.equals(StatusConstant.DISABLE)) {
             setmealMapper.update(setmeal);
             return;
         }
@@ -142,15 +143,15 @@ public class SetmealServiceImpl implements SetmealService {
         //如果要起售，那么菜品中不能有停售的
 
         List<Dish> dishes = dishMapper.listBySetmealId(id);
-        if(CollectionUtils.isEmpty(dishes)){
+        if (CollectionUtils.isEmpty(dishes)) {
             setmealMapper.update(setmeal);
-            return ;
+            return;
         }
         dishes.forEach(dish -> {
-                if (StatusConstant.DISABLE.equals(dish.getStatus())) {
-                    throw new SetmealEnableFailedException(MessageConstant.SETMEAL_ENABLE_FAILED);
-                }
-            });
+            if (StatusConstant.DISABLE.equals(dish.getStatus())) {
+                throw new SetmealEnableFailedException(MessageConstant.SETMEAL_ENABLE_FAILED);
+            }
+        });
         setmealMapper.update(setmeal);
 //      方案二
 // 得到套餐-菜品关系表
@@ -170,4 +171,28 @@ public class SetmealServiceImpl implements SetmealService {
 //        }
 
     }
+
+    /**
+     * 条件查询
+     *
+     * @param setmeal
+     * @return
+     */
+    @Override
+    public List<Setmeal> list(Setmeal setmeal) {
+        List<Setmeal> list = setmealMapper.list(setmeal);
+        return list;
+    }
+
+    /**
+     * 根据id查询菜品选项
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public List<DishItemVO> getDishItemById(Long id) {
+        return setmealMapper.getDishItemBySetmealId(id);
+    }
+
 }
