@@ -9,6 +9,9 @@ import com.sky.vo.DishVO;
 import java.util.List;
 
 public interface DishService {
+
+    void redisCleanCache(String key);
+
     void save(DishDTO dishDTO);
 
     PageResult page(DishPageQueryDTO dishPageQueryDTO);
