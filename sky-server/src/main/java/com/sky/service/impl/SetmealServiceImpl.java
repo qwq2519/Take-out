@@ -21,6 +21,9 @@ import com.sky.vo.DishItemVO;
 import com.sky.vo.SetmealVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -43,6 +46,7 @@ public class SetmealServiceImpl implements SetmealService {
 
     @Transactional
     @Override
+    @CacheEvict(cacheNames = "setmealCache",key = "#setmealDTO.categoryId")//对应分类的套餐增加了
     public void save(SetmealDTO setmealDTO) {
         Setmeal setmeal = new Setmeal();
         BeanUtils.copyProperties(setmealDTO, setmeal);
@@ -74,8 +78,14 @@ public class SetmealServiceImpl implements SetmealService {
     }
 
     @Override
+    public SetmealVO getById(Long id) {
+        return setmealMapper.getById(id);
+    }
+
+    @Override
+    @CacheEvict(cacheNames = "setmealCache",allEntries = true)
     public void deleteBatch(List<Long> ids) {
-        //查出所有套餐
+        //查出所有关联的套餐
         List<Setmeal> list = setmealMapper.listByIds(ids);
 
         //起售的套餐不能删除
@@ -92,13 +102,11 @@ public class SetmealServiceImpl implements SetmealService {
         setmealMapper.deleteByIds(ids);
     }
 
-    @Override
-    public SetmealVO getById(Long id) {
-        return setmealMapper.getById(id);
-    }
+
 
     @Transactional
     @Override
+    @CacheEvict(cacheNames = "setmealCache" ,allEntries = true)//套餐的分类可能会改变
     public void update(SetmealDTO setmealDTO) {
         Setmeal setmeal = new Setmeal();
         BeanUtils.copyProperties(setmealDTO, setmeal);
@@ -119,6 +127,7 @@ public class SetmealServiceImpl implements SetmealService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "setmealCache" ,allEntries = true)//套餐所属的分类无法判断
     public void updateStatus(Integer status, Long id) {
         //查询套餐完整信息
         SetmealVO setMeal = setmealMapper.getById(id);
@@ -179,6 +188,7 @@ public class SetmealServiceImpl implements SetmealService {
      * @return
      */
     @Override
+    @Cacheable(cacheNames = "setmealCache",key = "#setmeal.categoryId")
     public List<Setmeal> list(Setmeal setmeal) {
         List<Setmeal> list = setmealMapper.list(setmeal);
         return list;
