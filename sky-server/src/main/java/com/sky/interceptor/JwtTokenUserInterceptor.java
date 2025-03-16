@@ -33,8 +33,6 @@ public class JwtTokenUserInterceptor implements HandlerInterceptor {
 
         //拦截的不是动态方法(@Controller)，就放行
         if (!(handler instanceof HandlerMethod)) {
-            log.info("请求路径？？: {}", request.getRequestURI());
-
             return true;
         }
 
