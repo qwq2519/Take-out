@@ -34,4 +34,7 @@ public interface OrderMapper {
 
     @Select("select * from orders where id = #{orderId}")
     Orders getByOrderId(Long orderId);
+
+    @Select("select * from orders where id=#{id}")
+    Orders getById(Long id);
 }
