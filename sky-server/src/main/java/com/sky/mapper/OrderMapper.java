@@ -30,4 +30,7 @@ public interface OrderMapper {
     void updateStatus(Integer orderStatus, Integer orderPaidStatus, LocalDateTime check_out_time, Long id);
 
     List<Orders> list(Orders order);
+
+    @Select("select * from orders where id = #{orderId}")
+    Orders getByOrderId(Long orderId);
 }
