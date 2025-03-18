@@ -19,6 +19,7 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Value("${sky.baidu.ak}")
     private String ak;
+
+    @Autowired
+    private WebSocketServer webSocketServer;
+
 
     @Transactional
     @Override
@@ -157,6 +162,7 @@ public class OrderServiceImpl implements OrderService {
             throw new OrderBusinessException("该订单已支付");
         }*/
 
+        /*
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("code", "ORDERPAID");
         OrderPaymentVO vo = jsonObject.toJavaObject(OrderPaymentVO.class);
@@ -174,6 +180,16 @@ public class OrderServiceImpl implements OrderService {
 
         log.info("调用updateStatus，用于替换微信支付更新数据库状态的问题");
         orderMapper.updateStatus(OrderStatus, OrderPaidStatus, check_out_time, orderNumber);
+        */
+
+        JSONObject jsonObject = new JSONObject(); // 新加的
+        jsonObject.put("code", "ORDERPAID"); // 新加的
+
+        OrderPaymentVO vo = jsonObject.toJavaObject(OrderPaymentVO.class);
+        vo.setPackageStr(jsonObject.getString("package"));
+
+// 直接调用paySuccess方法，修改订单的状态、支付方式、支付状态、结账时间
+        paySuccess(ordersPaymentDTO.getOrderNumber()); //1
 
         return vo;
     }
@@ -201,6 +217,17 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+
+        //////////////////////////////////////////////
+        Map map = new HashMap();
+        map.put("type", 1);//消息类型，1表示来单提醒
+        map.put("orderId", orders.getId());
+        map.put("content", "订单号：" + outTradeNo);
+
+        //通过WebSocket实现来单提醒，向客户端浏览器推送消息
+        webSocketServer.sendToAllClient(JSON.toJSONString(map));
+        ///////////////////////////////////////////////////
+
     }
 
     @Override
