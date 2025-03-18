@@ -52,4 +52,10 @@ public interface OrderService {
      * @param ordersRejectionDTO
      */
     void rejection(OrdersRejectionDTO ordersRejectionDTO) throws Exception;
+    /**
+     * 派送订单
+     *
+     * @param id
+     */
+    void delivery(Long id);
 }

@@ -79,4 +79,15 @@ public class OrderController {
         orderService.rejection(ordersRejectionDTO);
         return Result.success();
     }
+    /**
+     * 派送订单
+     *
+     * @return
+     */
+    @PutMapping("/delivery/{id}")
+    @ApiOperation("派送订单")
+    public Result delivery(@PathVariable("id") Long id) {
+        orderService.delivery(id);
+        return Result.success();
+    }
 }
