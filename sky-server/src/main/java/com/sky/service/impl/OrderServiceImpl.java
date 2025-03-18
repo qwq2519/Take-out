@@ -189,9 +189,9 @@ public class OrderServiceImpl implements OrderService {
         vo.setPackageStr(jsonObject.getString("package"));
 
 // 直接调用paySuccess方法，修改订单的状态、支付方式、支付状态、结账时间
-        paySuccess(ordersPaymentDTO.getOrderNumber());
-        return vo;
+        paySuccess(ordersPaymentDTO.getOrderNumber()); //1
 
+        return vo;
     }
 
 
