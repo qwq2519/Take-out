@@ -27,10 +27,6 @@ public class JwtTokenUserInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-        log.info("Handler类型: {}", handler.getClass().getName());
-        log.info("请求路径: {}", request.getRequestURI());
-
-
         //拦截的不是动态方法(@Controller)，就放行
         if (!(handler instanceof HandlerMethod)) {
             return true;
@@ -38,7 +34,6 @@ public class JwtTokenUserInterceptor implements HandlerInterceptor {
 
         //从请求头中获取token
         String token = request.getHeader(jwtProperties.getUserTokenName());
-        log.info("C端Jwt校验:{}", token);
 
         //校验令牌
         try {
